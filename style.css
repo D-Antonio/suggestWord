@@ -1,1 +1,15 @@
-
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 16px);
+  background: linear-gradient(#6e0072, #181336);
+}
+input {
+  border: none;
+  background: white;
+  margin: 0;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  font-size: 16px;
+  padding: 10px 12px;
+}
