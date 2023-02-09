@@ -11,7 +11,30 @@
     <div style="position: absolute;">
         <input placeholder="Search word" aria-label='Search word' type="text" id="entrada">
     </div>
-    
     <script src="./main.js"></script>
+    <script>
+        async function getPokemons(limit) {
+            let datos = null;
+            await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=0`).then(function (response) {
+                return response.json();
+            }).then(function (data) {
+                datos = data.results;
+            }).catch(function (e) {
+                console.warn(e);
+            });
+            return datos;
+        }
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            let obj = await getPokemons(1000);
+            
+            new SuggestWord(
+                '#entrada', 
+                obj, 
+                'name'
+            ) 
+            
+        }, false); 
+    </script>
 </body>
 </html>
