@@ -21,23 +21,23 @@ class SuggestWord {
     /**
      * Constructor de la clase SuggestWord
      * @param {string} input - Seleccionador del elemento de entrada
-     * @param {object} object - Objeto que contiene las palabras a sugerir
+     * @param {obj} obj - Objeto que contiene las palabras a sugerir
      * @param {boolean} [index=false] - Indice para obtener los valores del objeto
      */
-    constructor(input, object, index = false) {
+    constructor(input, obj, index = false) {
         this.input = document.querySelector(input)
-        this.object = object
+        this.obj = obj
         this.index = index
-        this.words = (this.index === false) ? this.object : this.getIndexValues()
+        this.words = (this.index === false) ? this.obj : this.getIndexValues()
         this.main()
     }
 
     /**
      * Obtiene los valores del objeto a partir del indice especificado
-     * @param {object} [obj=this.object] - Objeto a buscar los valores
+     * @param {obj} [obj=this.obj] - Objeto a buscar los valores
      * @returns {Array} - Array con los valores encontrados
      */
-    getIndexValues(obj = this.object) {
+    getIndexValues(obj = this.obj) {
         let result = [];
         for (const key in obj) {
             if (obj.hasOwnProperty(key)) {
@@ -80,7 +80,7 @@ class SuggestWord {
     normalizeWord(word) {
         word = word.toLowerCase();
         let normal = word;
-        letters.forEach((letter, idx) => {
+        this.letters.forEach((letter, idx) => {
             let re = new RegExp('[' + letter.search + ']', 'g');
             normal = normal.replace(re, letter.replace);
         });
@@ -97,8 +97,65 @@ class SuggestWord {
      */
     normalizeWords(words) {
         let response = [];
-        words.forEach((word, idx) => response.push(normalizeWord(word.Bezeichnung)));
+        words.forEach((word, idx) => response.push(this.normalizeWord(word)));
         return response;
+    }
+
+    /**
+     * Método para manejar el evento de clic en los resultados de la búsqueda. 
+     * Verifica si el elemento clickeado es un elemento LI, y en caso afirmativo, selecciona el elemento.
+     * @param {Event} event - El evento de click en los resultados de la búsqueda.
+     */
+    handleResultClick(event) {
+        if (event.target && event.target.nodeName === "LI") {
+            this.selectItem(event.target);
+        }
+    }
+
+    /**
+     * Método para seleccionar un elemento de los resultados de la búsqueda. 
+     * Asigna el valor del elemento seleccionado al input y esconde los resultados.
+     * @param {HTMLElement} node - El elemento seleccionado de los resultados de la búsqueda.
+     */
+    selectItem(node) {
+        if (node) {
+            this.input.value = node.innerText;
+            this.hideResults();
+        }
+    }
+
+    /**
+     * Método para esconder los resultados de la búsqueda. 
+     * Limpia el contenido HTML del contenedor y agrega la clase 'hidden'.
+     */
+    hideResults() {
+        this.container.innerHTML = "";
+        this.container.classList.add("hidden");
+    }
+
+    /**
+     * Método para insertar HTML con los resultados de la búsqueda. 
+     * Crea una lista de elementos LI para cada resultado de la búsqueda y los une en un string. 
+     * Luego, asigna ese string como contenido HTML del contenedor. 
+     * Finalmente, quita la clase 'hidden' del contenedor para mostrar los resultados de la búsqueda.
+     * @param {Array} posibles - Los resultados de la búsqueda normalizados y ordenados.
+     */
+    insertHTML (posibles) {
+        this.container.innerHTML = posibles.map((result, index) => {
+            const isSelected = index === 0;
+            return `
+                <li
+                id='autocomplete-result-${index}'
+                class='autocomplete-result${isSelected ? " selected" : ""}'
+                role='option'
+                ${isSelected ? "aria-selected='true'" : ""}
+                >
+                ${result}
+                </li>
+            `;
+        }).join("")
+
+        this.container.classList.remove("hidden");
     }
 
     /**
@@ -107,22 +164,32 @@ class SuggestWord {
      * @returns {Array} posibles - Arreglo con las palabras que coinciden con la búsqueda
      */
     search(e) {
-        let key = this.input.value, posibles = []
+        let key = this.input.value
+        let posibles = []
         if (key.length > 0) {
             key = this.normalizeWord(key); // Normaliza la palabra clave
             this.words.forEach(function (word, idx) {
                 if (word.normal.indexOf(key.normal) !== -1) posibles.push(word.original); // Agrega a la lista de posibles resultados
             });
         }
+        this.insertHTML(posibles)
     }
 
+    /**
+     * Método principal para ejecutar la lógica de la clase SuggestWord.
+     * Crea un elemento UL y lo inserta después del input en el DOM.
+     * Normaliza y ordena las palabras de la lista de palabras.
+     * Agrega un evento de clic al contenedor de resultados para manejar el seleccionado de un resultado.
+     * Agrega un evento de entrada al input para buscar resultados.
+     */
     main() {
-        this.container = document.createElement("div")
+        this.container = document.createElement("ul")
         const parentElement = this.input.parentElement
-        parentElement.insertBefore(this.container, this.input)
+        parentElement.insertBefore(this.container, this.input.nextSibling)
 
         this.words = this.normalizeWords(this.words);
         this.words.sort(this.sortNormalizedWords);
-        this.input.addEventListener('input', this.search)
+        this.container.addEventListener("click", (event) => {this.handleResultClick(event)})
+        this.input.addEventListener('input', (e) => this.search(e))
     }
 }
