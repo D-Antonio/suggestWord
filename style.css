@@ -1,6 +1,6 @@
 body {
   display: flex;
-  align-items: center;
+  /*align-items: center;*/
   justify-content: center;
   height: calc(100vh - 16px);
   background: linear-gradient(#6e0072, #181336);
@@ -9,7 +9,34 @@ input {
   border: none;
   background: white;
   margin: 0;
+  width: -webkit-fill-available;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   font-size: 16px;
   padding: 10px 12px;
+}
+ul {
+  overflow-y: auto;
+  max-height: calc(100vh - 60px);
+  position: inherit;
+  width: -webkit-fill-available;
+  background: #fff;
+  margin: 0;
+  list-style: none;
+  transition: none;
+  padding: 0;
+  border: 1px solid #bfc8c9;
+}
+ul li {
+  padding: 6px 12px;
+  transition: 0.2s background;
+  cursor: pointer;
+}
+ul li:hover {
+  background: #e6f0f2;
+}
+ul li + li {
+  border-top: 1px solid #bfc8c9;
+}
+.hidden {
+  display: none;
 }
