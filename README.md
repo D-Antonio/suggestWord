@@ -19,7 +19,7 @@ new SuggestWord(
 )
 ~~~
 
-## [example](https://travis-ci.org/joemccann/dillinger)
+## [example](https://suggest-word.vercel.app/)
 
 in this example I will filter pokemon names by consuming [pokeapi](https://pokeapi.co/)
 
@@ -69,4 +69,4 @@ document.addEventListener('DOMContentLoaded', async function () {
     ) 
 }, false); 
 ~~~
-[Click me to view demo]()
+[Click me to view demo](https://suggest-word.vercel.app/)
